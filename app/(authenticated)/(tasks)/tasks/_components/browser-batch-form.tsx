@@ -20,7 +20,7 @@ import {
 } from "@/app/(authenticated)/_lib/browser-run-store";
 import { browserBenchmarkTasks } from "@/lib/browser/benchmark-tasks";
 
-const starterTasks = browserBenchmarkTasks
+const starterTasks = browserBenchmarkTasks("all")
   .map((task) => task.prompt)
   .join("\n");
 
