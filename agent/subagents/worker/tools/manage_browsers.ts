@@ -15,6 +15,7 @@ import {
 } from "@/db/services/browsers";
 import { kernel } from "@/lib/kernel";
 import { requireWorkerScope } from "@/agent/subagents/worker/lib/access";
+import { disposeBrowserLoopSession } from "@/lib/browser/semantic-loop";
 import { requireOwnedBrowserSession } from "@/agent/subagents/worker/lib/owned-browser";
 
 const browserTimeoutFloorSeconds = 15 * 60;
@@ -150,6 +151,7 @@ export default defineTool({
       case "delete": {
         const sessionId = requireSessionId(input.session_id);
         await requireOwnedBrowserSession(scope, sessionId);
+        await disposeBrowserLoopSession(sessionId);
         await kernel.browsers
           .deleteByID(sessionId, { signal })
           .catch((error: unknown) => {
@@ -176,6 +178,7 @@ async function retrieveBrowser(
     return await kernel.browsers.retrieve(sessionId, {}, { signal });
   } catch (error) {
     if (!isNotFoundError(error)) throw error;
+    await disposeBrowserLoopSession(sessionId);
     await deleteBrowserSession(scope, sessionId);
     throw new Error(
       "Browser session no longer exists. Its stale record was removed; create a fresh browser instead of retrying this session ID.",
@@ -222,8 +225,9 @@ function lifecycleResult(browser: KernelBrowser) {
   return {
     browser: value,
     next_actions: [
-      `Use execute_playwright_code with session_id "${value.session_id}" for deterministic browser automation.`,
-      `Use computer_action with session_id "${value.session_id}" for visual browser control.`,
+      `Call browser_snapshot with session_id "${value.session_id}" before interacting.`,
+      `Use browser_find or browser_text to narrow large pages, then browser_act for verified dependent actions.`,
+      `Use the Browser Loop atomic tools for a single navigation or interaction, and computer_action only when visual coordinate control is necessary.`,
       `Use manage_browsers with action "delete" and session_id "${value.session_id}" when finished.`,
     ],
   };

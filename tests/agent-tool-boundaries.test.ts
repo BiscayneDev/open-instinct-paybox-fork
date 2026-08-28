@@ -47,10 +47,10 @@ describe("root and worker capability boundaries", () => {
       "ask_question.ts",
       "capture_browser_image.ts",
       "computer_action.ts",
-      "execute_playwright_code.ts",
       "fill_from_vault.ts",
       "list_vault.ts",
       "manage_browsers.ts",
+      "semantic_browser.ts",
     ]);
     expect(existsSync(`${workerRoot}/tools/sendMessage.ts`)).toBe(false);
     expect(existsSync(`${workerRoot}/tools/request_vault_setup.ts`)).toBe(
@@ -68,7 +68,6 @@ describe("root and worker capability boundaries", () => {
     for (const tool of [
       "capture_browser_image",
       "computer_action",
-      "execute_playwright_code",
       "manage_browsers",
     ]) {
       const source = readFileSync(`${workerTools}/${tool}.ts`, "utf8");
@@ -78,8 +77,15 @@ describe("root and worker capability boundaries", () => {
     }
     expect(existsSync(`${workerRoot}/hooks/session-owner.ts`)).toBe(true);
     expect(existsSync(`${workerRoot}/skills/browser-execution/SKILL.md`)).toBe(
-      true
+      false
     );
+    const semanticBrowser = readFileSync(
+      `${workerTools}/semantic_browser.ts`,
+      "utf8"
+    );
+    expect(semanticBrowser).toContain("defineDynamic(");
+    expect(semanticBrowser).toContain("requireWorkerScope(context)");
+    expect(semanticBrowser).toContain('from "@onkernel/browser-loop"');
     expect(readFileSync(`${workerRoot}/instructions.md`, "utf8")).not.toContain(
       "`inspect_autofill`"
     );
@@ -97,7 +103,6 @@ describe("root and worker capability boundaries", () => {
     for (const tool of [
       "capture_browser_image",
       "computer_action",
-      "execute_playwright_code",
       "manage_browsers",
     ]) {
       const source = readFileSync(`${workerTools}/${tool}.ts`, "utf8");
