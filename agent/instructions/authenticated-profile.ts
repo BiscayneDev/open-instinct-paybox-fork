@@ -10,6 +10,10 @@ export default defineDynamic({
         profileDetail("Full name", attributes?.fullName),
         profileDetail("Email address", attributes?.emailAddress),
         profileDetail("Phone number", attributes?.phoneNumber),
+        profileDetail("Street address", attributes?.addressLine1),
+        profileDetail("City", attributes?.city),
+        profileDetail("State/region", attributes?.stateRegion),
+        profileDetail("Postal code", attributes?.postalCode),
         profileDetail("Country/region", attributes?.countryRegion),
       ].filter((detail) => detail !== null);
       if (details.length === 0) return null;
