@@ -76,7 +76,7 @@ export default defineTool({
                 input.timeout_seconds ?? browserTimeoutFloorSeconds,
               viewport: browserViewport(input),
             },
-            { signal }
+            { maxRetries: 8, signal }
           );
           try {
             await createBrowserSession(scope, {

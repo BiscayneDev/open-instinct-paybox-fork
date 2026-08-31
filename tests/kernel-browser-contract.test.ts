@@ -125,7 +125,7 @@ describe("Kernel browser contract", () => {
         timeout_seconds: 900,
         viewport: undefined,
       },
-      { signal: undefined }
+      { maxRetries: 8, signal: undefined }
     );
     expect(mocks.withBrowserProfileWriteLock).not.toHaveBeenCalled();
   });
